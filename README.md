@@ -1,6 +1,7 @@
-# CreativeSketchTemplate
+# CanvasSketchTemplate
 
-A (hopefully) quicker way to stand up a Javascript creative coding environment focused on 3D realtime with Three.js.
+A (hopefully) quicker way to stand up a Javascript creative coding environment focused on 2D static HTML Canvas
+sketches.
 
 ## Organization
 
