@@ -1,28 +1,32 @@
-import imageUrl from "/assets/sample_image.jpg";
+import { loadImage } from "./lib/loaders";
+
+const StateDidChangeEvent = "stateDidChange";
+
+const imageUrl = "/assets/sample_image.jpg";
 
 const state = {
-  backgroundColor: "#ff00ff",
-  imageScale: 0.5,
+    backgroundColor: "#ff00ff",
+    imageScale: 0.5,
+    image: null,
 };
 
-const loadImage = (url) =>
-  new Promise((resolve, reject) => {
-    const img = new Image();
-    img.addEventListener("load", () => resolve(img));
-    img.addEventListener("error", (err) => reject(err));
-    img.src = url;
-  });
+async function createState() {
+    // opportunity to run any long processes (async loaders)
+    state.image = await loadImage(imageUrl);
 
-/*
- * Pass an update function to be called when state changes
- */
-async function createState(updateFn) {
-  state.updateFn = updateFn;
+    // use a Proxy to publish state change events
+    const proxiedState = new Proxy(state, {
+        set(obj, prop, value) {
+            // apply update
+            Reflect.set(obj, prop, value);
 
-  // this is a good place for async loaders
-  state.image = await loadImage(imageUrl);
+            // publish update event
+            window.dispatchEvent(new Event(StateDidChangeEvent));
 
-  return state;
+            return true;
+        },
+    });
+    return proxiedState;
 }
 
-export default createState;
+export { createState, StateDidChangeEvent };
