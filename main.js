@@ -12,16 +12,13 @@ async function init() {
     const canvas = document.getElementById("render-canvas");
     sketch = new Sketch(canvas);
 
-    // TODO: upgrade window resizing code
-    window.onresize = onWindowResize;
-    onWindowResize(); // set initial size
-
     state = await createState();
     window.addEventListener(StateDidChangeEvent, render);
 
     createGUI(state);
 
-    render(); // first render
+    window.onresize = onWindowResize;
+    onWindowResize(); // set initial size - will fire first render
 }
 
 function render() {
@@ -33,11 +30,10 @@ function render() {
 
 function onWindowResize() {
     // match canvas size to window size
-    // TODO: upgrade
-    // const canvas = document.getElementById("render-canvas");
-    // canvas.width = window.innerWidth;
-    // canvas.height = window.innerHeight;
-    // render();
+    const canvas = document.getElementById("render-canvas");
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    render();
 }
 
 window.onkeydown = function (evt) {
