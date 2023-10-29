@@ -1,31 +1,59 @@
 import "./style.css";
 
-import Sketch from "./src/sketch";
-import { createState, StateDidChangeEvent } from "./src/state";
+import createState from "./src/state";
 import createGUI from "./src/gui";
+import render from "./src/render";
+import update from "./src/update";
 
-let state, sketch;
-
-init();
+let ctx, state;
 
 async function init() {
     const canvas = document.getElementById("render-canvas");
-    sketch = new Sketch(canvas);
+    ctx = canvas.getContext("2d");
 
+    // create initial state
     state = await createState();
-    window.addEventListener(StateDidChangeEvent, render);
+    // optionally watch state updates and call render when they occur
+    state = watchState(state);
 
-    createGUI(state);
+    // GUI can mutate state
+    createGUI(state, canvas);
 
     window.onresize = onWindowResize;
     onWindowResize(); // set initial size - will fire first render
+
+    // start animation loop
+    requestAnimationFrame(loop);
+}
+init();
+
+function loop(timestamp) {
+    update(state, timestamp);
+
+    render(ctx, state);
+
+    requestAnimationFrame(loop);
 }
 
-function render() {
-    // don't render until our state is ready
+function stateDidUpdate() {
     if (state) {
-        sketch.render(state);
+        render(ctx, state);
     }
+}
+
+function watchState(state) {
+    // use a Proxy to publish state change events
+    const proxiedState = new Proxy(state, {
+        set(obj, prop, value) {
+            // apply update
+            Reflect.set(obj, prop, value);
+
+            stateDidUpdate();
+
+            return true;
+        },
+    });
+    return proxiedState;
 }
 
 function onWindowResize() {
@@ -33,7 +61,7 @@ function onWindowResize() {
     const canvas = document.getElementById("render-canvas");
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
-    render();
+    stateDidUpdate();
 }
 
 window.onkeydown = function (evt) {

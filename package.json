@@ -16,12 +16,14 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "dat.gui": "^0.7.9",
-        "prettier": "^3.0.3"
+        "@thi.ng/color": "^5.5.27",
+        "@thi.ng/geom": "^5.2.13",
+        "@thi.ng/hiccup-canvas": "^2.4.3",
+        "@thi.ng/math": "^5.7.0",
+        "@thi.ng/random": "^3.6.10",
+        "dat.gui": "^0.7.9"
     },
     "devDependencies": {
-        "eslint": "^8.52.0",
-        "eslint-config-prettier": "^9.0.0",
         "vite": "^2.7.2"
     }
 }
